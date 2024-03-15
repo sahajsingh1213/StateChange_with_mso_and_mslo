@@ -16,6 +16,44 @@ class MyViewModel:ViewModel() {
     var count = mutableStateOf(1)
     var a = mutableStateOf("Waiting for data ")
 
+    var Results = mutableStateListOf<String>()
+    var ResultsPicture = mutableStateListOf<String>()
+    var email = mutableStateListOf<String>()
+    var Dob = mutableStateListOf<String>()
+    var Address = mutableStateListOf<String>()
+    var phone = mutableStateListOf<String>()
+    var password = mutableStateListOf<String>()
+
+
+
+    val retrofitBuilder = Retrofit.Builder().baseUrl("https://randomuser.me/")
+        .addConverterFactory(GsonConverterFactory.create()).build()
+        .create(RandamApi::class.java)
+
+
+    val job = viewModelScope.launch {
+        repeat(10) {
+            val response = retrofitBuilder.getMyData()!!
+            if (response.isSuccessful) {
+                for (mydata in response.body()?.results!!) {
+                    Log.d("mytag", "name = ${mydata.name}")
+                    Results.add(mydata.name.first)
+                    ResultsPicture.add(mydata.picture.large)
+                    email.add(mydata.email)
+                    Dob.add(mydata.dob.date.removeRange(10, 24).Datereverse())
+                    Address.add("Country: ${mydata.location.country} \n State: ${mydata.location.state} \n City:${mydata.location.city}")
+                    phone.add(mydata.phone)
+                    password.add(mydata.login.password)
+                }
+
+            }
+        }
+
+//king
+
+
+    }
+
     fun increasei(){
         count.value+=1
         a.value = "data is fetched ${count.value}"

@@ -51,56 +51,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
 
-        var Results = mutableStateOf(mutableListOf<String>())
-        var ResultsPicture = mutableStateOf(mutableListOf<String>())
-        var email = mutableStateOf(mutableListOf<String>())
-        var Dob = mutableStateOf(mutableListOf<String>())
-        var Address = mutableStateOf(mutableListOf<String>())
-        var phone = mutableStateOf(mutableListOf<String>())
-        var password = mutableStateOf(mutableListOf<String>())
+
         //exeption handler
         var Handler = CoroutineExceptionHandler { _, throwable ->
             Log.d("mytag","Exeption is $throwable")
         }
 
-        val retrofitBuilder = Retrofit.Builder().baseUrl("https://randomuser.me/")
-            .addConverterFactory(GsonConverterFactory.create()).build()
-            .create(RandamApi::class.java)
 
-        val job = CoroutineScope(Dispatchers.Default).launch {
-            repeat(10) {
-                val response = retrofitBuilder.getMyData()!!
-                if (response.isSuccessful) {
-                    for (mydata in response.body()?.results!!) {
-                        Log.d("mytag", "name = ${mydata.name}")
-                        Results.value.add(mydata.name.first)
-                        ResultsPicture.value.add(mydata.picture.large)
-                        email.value.add(mydata.email)
-                        Dob.value.add(mydata.dob.date.removeRange(10, 24).Datereverse())
-                        Address.value.add("Country: ${mydata.location.country} \n State: ${mydata.location.state} \n City:${mydata.location.city}")
-                        phone.value.add(mydata.phone)
-                        password.value.add(mydata.login.password)
-                    }
-
-                }
-            }
-
-//king
-
-
-        }
-
-
-
-
-
-
-
-        CoroutineScope(Dispatchers.Main).launch(Handler) {
-
-            repeat(2){
-
-                if (Results.value.isNotEmpty()) {
 
                     setContent {
 
@@ -124,11 +81,11 @@ class MainActivity : ComponentActivity() {
                         )
 
                         LaunchedEffect(key1 = list) {
+vm.job.join()
 
+                            Log.d("mytag", "nameMerabhai = ${vm.Results.get(0)} ${vm.Results.size}")
 
-                            Log.d("mytag", "nameMerabhai = ${Results.value.get(0)}")
-
-                            if (Results.value.get(0) != " ") {
+                            if (vm.Results.get(0) != " ") {
                                 Log.d("mytag", "results is non-empty before")
                             } else {
                                 Log.d("mytag", "results is empty is before")
@@ -138,8 +95,8 @@ class MainActivity : ComponentActivity() {
                         }
 
 
-                        var size = if (Results.value.size != 10) 1 else Results.value.size
-                        if (Results.value.size > 1) {
+                        var size = if (vm.Results.size != 10) 1 else vm.Results.size
+                        if (vm.Results.size > 1) {
                             vm.increasei()
                         }
 
@@ -154,18 +111,18 @@ class MainActivity : ComponentActivity() {
 
 
                                 items(size) {
-                                    if (Results.value.isNotEmpty()) {
+                                    if (vm.Results.isNotEmpty()) {
                                         finalRender(
-                                            name = "${Results.value.get(it)} ${Results.value.size}",
-                                            email = "${email.value.get(it)}",
-                                            Dob = "${Dob.value.get(it)}",
-                                            address = "${Address.value.get(it)}",
-                                            Phone = "${phone.value.get(it)}",
-                                            password = "${password.value.get(it)}",
-                                            painter = "${ResultsPicture.value.get(it)}"
+                                            name = "${vm.Results.get(it)} ${vm.Results.size}",
+                                            email = "${vm.email.get(it)}",
+                                            Dob = "${vm.Dob.get(it)}",
+                                            address = "${vm.Address.get(it)}",
+                                            Phone = "${vm.phone.get(it)}",
+                                            password = "${vm.password.get(it)}",
+                                            painter = "${vm.ResultsPicture.get(it)}"
                                         )
                                     } else finalRender(
-                                        name = "${Users} ${Results.value.size}",
+                                        name = "${Users} ${vm.Results.size}",
                                         email = "{Results.value.first().email }",
                                         Dob = "{Users.value[0].results[0].dob.date}",
                                         address = "{(Users.value[0].results[0].location.city)}",
@@ -185,99 +142,10 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     }
-                } else {
-                    setContent {
-
-                        var Users = "no"
-                        var UserI = MutableLiveData<User>()
-
-
-                        var list = mutableListOf<String>(
-                            "https://www.hollywoodreporter.com/wp-content/uploads/2014/02/new_godzilla_poster.jpg",
-                            "https://i.pinimg.com/474x/9a/79/e9/9a79e9c7e0296737e00f967aadc56f72.jpg",
-                            "https://m.media-amazon.com/images/M/MV5BOGFjYWNkMTMtMTg1ZC00Y2I4LTg0ZTYtN2ZlMzI4MGQwNzg4XkEyXkFqcGdeQXVyMTkxNjUyNQ@@._V1_.jpg",
-                            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuNdl-J7xwP7DIYaerniPZ-yqXLL_CIHNirabClCC8qlDOjrr49TubkIn3Ig&s",
-                            "https://img.freepik.com/free-photo/closeup-shot-beautiful-butterfly-with-interesting-textures-orange-petaled-flower_181624-7640.jpg?size=626&ext=jpg",
-                            "https://www.hollywoodreporter.com/wp-content/uploads/2014/02/new_godzilla_poster.jpg",
-                            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShUBTbuG-g2RJcLSx5vdBO_OBODXTiiLxfmw&usqp=CAU",
-                            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRnIOpjil1igWfSXoaGO8R-gUI5E2D3eRF9eA&usqp=CAU",
-                            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfTkFeN9WqpmwLrPPTzI1xCV5uYpMSL5-wMQ&usqp=CAU",
-                            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS_JscbylLmdNMSix2PAr7-AXA7UI2Ut7W6sw&usqp=CAU"
-
-
-                        )
-
-
-                        LaunchedEffect(key1 = list) {
-
-
-                            try {
-                                if (Results?.value?.isNotEmpty()!!) {
-                                    Log.d("mytag", "nameMerabhai = ${Results?.value?.get(0)!!}")
-
-                                    Log.d("mytag", "results is non-empty before")
-                                } else {
-                                    Log.d("mytag", "results is empty is before")
-                                }
-                            } catch (ex: Exception) {
-                                Log.d("mytag", "exception is $ex ")
-                            }
-
-                        }
-
-
-                        var size = if (Results.value.size != 10) 1 else Results.value.size
-                        if (Results.value.size > 1) {
-                        Log.d("mytag","function called")
-                            vm.increasei()
-                        }
 
 
 
-                        Box(
-                            Modifier.fillMaxSize()
-                        ) {
 
-
-                            LazyRow {
-
-
-                                items(size) {
-                                    if (Results.value.isNotEmpty()) {
-                                        finalRender(
-                                            name = "{Results.value.get(it)} {Results.value.size}",
-                                            email = "{email.value.get(it)}",
-                                            Dob = "{Dob.value.get(it)}",
-                                            address = "{Address.value.get(it)}",
-                                            Phone = "{phone.value.get(it)}",
-                                            password = "{password.value.get(it)}",
-                                            painter = "{ResultsPicture.value.get(it)}"
-                                        )
-                                    } else finalRender(
-                                        name = "{Users} {Results.value.size}",
-                                        email = "{Results.value.first().email }",
-                                        Dob = "{Users.value[0].results[0].dob.date}",
-                                        address = "{(Users.value[0].results[0].location.city)}",
-                                        Phone = "{Users.value[0].results[0].phone}",
-                                        password = "{Users.value[0].results[0].login.password}",
-                                        painter = "{ResultsPicture.value[0]}"
-                                    )
-
-
-                                }
-                            }
-
-                            Button(onClick = {
-                                vm.increasei()
-                            }) {
-                                Text(text = "${vm.a.value}")
-                            }
-                        }
-                    }
-                    job.join()
-                }
-
-            }
 
 
         }
@@ -286,7 +154,7 @@ class MainActivity : ComponentActivity() {
     }
 
 
-}
+
 
 
 
